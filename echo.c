@@ -2,16 +2,16 @@
 
 #include "headers.h"
 
-void echo(char* string) {
-  char* token;
-  token = strtok(string, " \t");
+int tichnas_echo(char** args) {
+  int i = 1;
 
-  while (token != NULL) {
-    for (ll i = 0; token[i] != '\0'; i++) printf("%c", token[i]);
-
-    token = strtok(NULL, " \t");
-    printf(" ");
+  while (args[i + 1] != NULL) {
+    printf("%s ", args[i]);
+    i++;
   }
 
+  if (args[i] != NULL) printf("%s", args[i]);
   printf("\n");
+
+  return 0;
 }

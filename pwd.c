@@ -2,4 +2,7 @@
 
 #include "headers.h"
 
-void pwd(char* cwd) { printf("%s\n", cwd); }
+int tichnas_pwd(char* cwd) {
+  printf("%s\n", cwd);
+  return 0;
+}

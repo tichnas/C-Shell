@@ -1,6 +1,6 @@
 #ifndef __CD_H
 #define __CD_H
 
-void cd(char*, char*, char*);
+int tichnas_cd(char*, char*, char*, char*);
 
 #endif

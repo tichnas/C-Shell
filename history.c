@@ -61,7 +61,7 @@ void addHistory(char* root, char* str) {
   }
 }
 
-void history(char* root, char* limitStr) {
+int tichnas_history(char* root, char* limitStr) {
   int limit = 10;
 
   if (limitStr) sscanf(limitStr, "%d", &limit);
@@ -74,4 +74,6 @@ void history(char* root, char* limitStr) {
 
   for (int i = noOfCommands - limit; i < noOfCommands; i++)
     printf("%s", commands[i]);
+
+  return 0;
 }

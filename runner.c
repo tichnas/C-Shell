@@ -2,35 +2,47 @@
 
 #include "headers.h"
 
-void runCommand(int* bgPid, char** bgCommand, int background, char** args) {
+int runCommand(int background, char** args) {
   int pid = fork();
 
   if (pid < 0) {
     perror("Error");
+    return -1;
 
   } else if (pid) {
     if (background) {
-      printf("%s started with PID %d\n", args[0], pid);
+      fprintf(stderr, "%s started with PID %d\n", args[0], pid);
 
-      for (int i = 0; i < 100; i++) {
-        if (!bgPid[i]) {
-          bgPid[i] = pid;
-          bgCommand[i] = malloc(strlen(args[0]) + 1);
-          strcpy(bgCommand[i], args[0]);
-          break;
-        }
-      }
+      return pid;
 
     } else {
-      waitpid(pid, NULL, 0);
+      int status;
+
+      signal(SIGTTIN, SIG_IGN);
+      signal(SIGTTOU, SIG_IGN);
+
+      tcsetpgrp(0, pid);
+
+      waitpid(pid, &status, WUNTRACED);
+
+      tcsetpgrp(0, getpgid(0));
+
+      signal(SIGTTIN, SIG_DFL);
+      signal(SIGTTOU, SIG_DFL);
+
+      if (WIFSTOPPED(status)) return pid;
+
+      if (WEXITSTATUS(status) == EXIT_FAILURE) return -1;
     }
 
   } else {
-    if (background) setpgid(0, 0);
+    setpgid(0, 0);
 
     if (execvp(args[0], args) < 0) {
       perror("Error");
       exit(1);
     }
   }
+
+  return 0;
 }

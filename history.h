@@ -2,6 +2,6 @@
 #define __HISTORY_H
 
 void addHistory(char*, char*);
-void history(char*, char*);
+int tichnas_history(char*, char*);
 
 #endif

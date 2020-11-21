@@ -5,7 +5,7 @@
 ll number[] = {0,      9,       99,       999,       9999,       99999,
                999999, 9999999, 99999999, 999999999, 9999999999, -1};
 
-int printDetails(struct stat* itemStatus, int sizeWidth, int linkWidth) {
+void printDetails(struct stat* itemStatus, int sizeWidth, int linkWidth) {
   int permissionBit = (1 << 8);
   char permissionSymbols[] = "rwx";
   char months[][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -36,11 +36,9 @@ int printDetails(struct stat* itemStatus, int sizeWidth, int linkWidth) {
 
   printf("%s %02d %02d:%02d ", months[time->tm_mon], time->tm_mday,
          time->tm_hour, time->tm_min);
-
-  return 0;
 }
 
-void printLs(char* root, char* rawLocation, int showAll, int showDetails) {
+int printLs(char* root, char* rawLocation, int showAll, int showDetails) {
   char location[1024] = "";
   char fullPath[1024];
 
@@ -55,7 +53,7 @@ void printLs(char* root, char* rawLocation, int showAll, int showDetails) {
 
   if (stat(location, &locationStatus) < 0) {
     perror("Error");
-    return;
+    return -1;
   }
 
   if (S_ISDIR(locationStatus.st_mode)) {
@@ -65,7 +63,7 @@ void printLs(char* root, char* rawLocation, int showAll, int showDetails) {
 
     if ((n = scandir(location, &namelist, NULL, alphasort)) < 0) {
       perror("Error");
-      return;
+      return -1;
     }
 
     struct stat statusArr[n];
@@ -81,7 +79,7 @@ void printLs(char* root, char* rawLocation, int showAll, int showDetails) {
 
         if (stat(fullPath, &statusArr[i]) < 0) {
           perror("Error");
-          return;
+          return -1;
         }
 
         total += statusArr[i].st_blocks;
@@ -111,7 +109,7 @@ void printLs(char* root, char* rawLocation, int showAll, int showDetails) {
 
     if (showDetails && stat(location, &status) < 0) {
       perror("Error");
-      return;
+      return -1;
     }
 
     int sizeWidth = 0;
@@ -126,13 +124,16 @@ void printLs(char* root, char* rawLocation, int showAll, int showDetails) {
 
     printf("%s\n", location);
   }
+
+  return 0;
 }
 
-void ls(char* root, char** args) {
+int tichnas_ls(char* root, char** args) {
   int showAll = 0;
   int showDetails = 0;
   int noOfArguments = 0;
   int firstArg;
+  int retValue = 0;
 
   for (int i = 0; args[i] != NULL; i++) {
     if (args[i][0] == '-') {
@@ -145,7 +146,9 @@ void ls(char* root, char** args) {
   }
 
   if (noOfArguments <= 1) {
-    printLs(root, noOfArguments ? args[firstArg] : ".", showAll, showDetails);
+    if (printLs(root, noOfArguments ? args[firstArg] : ".", showAll,
+                showDetails) < 0)
+      retValue = -1;
   } else {
     firstArg = 0;
 
@@ -157,7 +160,9 @@ void ls(char* root, char** args) {
 
       printf("%s:\n", args[i]);
 
-      printLs(root, args[i], showAll, showDetails);
+      if (printLs(root, args[i], showAll, showDetails) < 0) retValue = -1;
     }
   }
+
+  return retValue;
 }

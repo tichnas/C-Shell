@@ -2,15 +2,15 @@
 
 #include "headers.h"
 
-void pinfo(char* root, char* pidStr) {
+int tichnas_pinfo(char* root, char* pidStr) {
   char dataFolder[1024] = "/proc/";
   char fileName[1024];
-  int pid;
-  char status;
-  int memory;
+  int pid = -1;
+  char status = '-';
+  int memory = -1;
   char* path = malloc(1024);
-  int pgrp;
-  int tpgid;
+  int pgrp = -1;
+  int tpgid = -1;
 
   if (pidStr) {
     strcat(dataFolder, pidStr);
@@ -27,12 +27,13 @@ void pinfo(char* root, char* pidStr) {
     fscanf(file,
            "%d %*s %c %*s %d %*s %*s %d %*s %*s %*s %*s %*s %*s %*s %*s %*s "
            "%*s %*s %*s %*s %*s %d",
-           &pid, &status, &pgrp, &tpgid,  &memory);
+           &pid, &status, &pgrp, &tpgid, &memory);
 
     printf("pid -- %d\nProcess Status -- %c%c\nmemory -- %d\n", pid, status,
            pgrp == tpgid ? '+' : ' ', memory);
   } else {
     perror("Error");
+    return -1;
   }
 
   fclose(file);
@@ -62,5 +63,8 @@ void pinfo(char* root, char* pidStr) {
     printf("Executable Path -- %s\n", path);
   } else {
     perror("Error");
+    return -1;
   }
+
+  return 0;
 }

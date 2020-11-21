@@ -46,7 +46,29 @@ From the root directory of project, run `make` followed by `./main`
 
 ### Command Files
 
-###### Files containing functions to run a particular command. Function name is same as command name.
+###### Files containing functions to run a particular command.
+
+- `env.c`
+
+  - Contains commands `setenv` and `unsetenv`.
+  - Used to set/unset an environment variable.
+
+- `jobs.c`
+
+  - Prints all currently running background processes.
+
+- `kjob.c`
+
+  - Used to send signal to a process by job number.
+  - Also used in a loop to implement `overkill`.
+
+- `fg.c`
+
+  - Brings a process to foreground and changes it state to Running.
+
+- `bg.c`
+
+  - Changes status of background process from Stopped to Running.
 
 - `pwd.c`
 
@@ -74,6 +96,33 @@ From the root directory of project, run `make` followed by `./main`
 
   - Prints last _n_ commands, where n is the number given or 10.
 
+### Other Implementations
+
+###### Commands/functions which don't have a separate file.
+
+- Signals
+
+  - `Ctrl+Z` Sends current foreground process to background.
+  - `Ctrl+C` Stops current foreground process.
+
+- I/O Redirection and Pipes
+
+  - Parsing is done in `command.c`.
+  - `main.c` handles everything else.
+
+- Background Processes Manipulations
+
+  - Implementation of background processes list, removing/adding them from/to the list is done in `main.c`.
+
+- Exit Codes
+
+  - Depending on whether last command was successful or not, **:')** or **:'(** will appear before the prompt.
+  - A background process will ONLY fail if the forking fails. All other situations will result in command success.
+
+- Exiting from the Shell
+  - `Ctrl+D` on an empty prompt.
+  - `quit` command.
+
 ## Assumptions
 
 - Reasonable assumptions are made for things like length of current path, number of commands, command length, etc. The shell will work perfectly for all "day to day work".
@@ -98,4 +147,6 @@ From the root directory of project, run `make` followed by `./main`
 
 - A hidden file (`.history`) is used to store history in a readable format. Any changes explicitly done in this file may result in unexpected output of `history` command.
 
-> More features coming soon, Stay Tuned!
+- **<**, **>**, **>>** and **|** will always have their special meanings and will be used correctly. This means that for I/O redirection, a file (may be an invalid name) will always come after the arrow. Similary, a command (may be an invalid) will always come after a pipe.
+
+> Will try to implement more features soon, Wish me luck!
